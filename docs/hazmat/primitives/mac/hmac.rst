@@ -28,10 +28,13 @@ of a message.
     .. doctest::
 
         >>> from cryptography.hazmat.primitives import hashes, hmac
+        >>> import os
+        >>> key = os.urandom(32)
         >>> h = hmac.HMAC(key, hashes.SHA256())
         >>> h.update(b"message to hash")
-        >>> h.finalize()
-        b'#F\xdaI\x8b"e\xc4\xf1\xbb\x9a\x8fc\xff\xf5\xdex.\xbc\xcd/+\x8a\x86\x1d\x84\'\xc3\xa6\x1d\xd8J'
+        >>> signature = h.finalize()
+        >>> print(signature)
+        b'\xcb\x07\xe7.\x86&\xc3\t\xf8w\xb7\x8a1\xbe3\xa5JQH*5\x93\xf7H\xa0\x10\x80\xa8\x89\xf9vY'
 
     If the backend doesn't support the requested ``algorithm`` an
     :class:`~cryptography.exceptions.UnsupportedAlgorithm` exception will be
@@ -48,7 +51,10 @@ of a message.
 
         >>> h = hmac.HMAC(key, hashes.SHA256())
         >>> h.update(b"message to hash")
-        >>> h.verify(b"an incorrect signature")
+        >>> h_a_copy = h.copy() # get a copy of `h' to be reused
+        >>> h.verify(signature)
+        >>> 
+        >>> h_a_copy.verify(b"an incorrect signature")
         Traceback (most recent call last):
         ...
         cryptography.exceptions.InvalidSignature: Signature did not match digest.
